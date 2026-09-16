@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
 from students.models import Student
 from .serializers import StudentSerializer
@@ -9,7 +9,7 @@ from rest_framework.decorators import api_view
 # Create your views here.
 
 
-@api_view(['GET'])
+@api_view(['GET' ,'POST'])
 def studentsView(request):
 #My MANUAL Dict Method
     # # SAFE = True
@@ -52,5 +52,32 @@ def studentsView(request):
         # return JsonResponse(serializer.data, safe = False)
         return Response(serializer.data, status = status.HTTP_200_OK)
 
-
     # return JsonResponse(students_list, safe=False) 
+    elif request.method == "POST" : 
+        serializer = StudentSerializer(data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status = status.HTTP_201_CREATED)
+        else : 
+            print(serializer.errors)
+            return Response(serializer.errors, status = status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET', 'PUT', 'DELETE'])
+def studentDetailsView(request, pk):
+    student = get_object_or_404(Student, pk = pk)
+
+    if request.method == "GET" : 
+        serializer = StudentSerializer(student)
+        return Response(serializer.data, status = status.HTTP_200_OK)
+
+    elif request.method == "PUT" : 
+        serializer = StudentSerializer(student, data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    elif request.method == "DELETE" : 
+        print(StudentSerializer(student).data) 
+        student.delete() 
+        return Response(status=status.HTTP_204_NO_CONTENT)
