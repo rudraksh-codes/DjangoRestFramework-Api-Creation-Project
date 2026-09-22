@@ -12,6 +12,7 @@ from rest_framework.exceptions import NotFound
 from rest_framework import mixins, generics
 from rest_framework import viewsets
 from blogs.models import Blog, Comment
+from .paginations import CustomPageNumberPagination, CustomLimitOffsetPagination
 
 
 # Create your views here.
@@ -95,8 +96,18 @@ def studentDetailsView(request, pk):
 #     #method like a fn based view , get method check is already there
 #     def get(self, request):
 #         employees = Employee.objects.all() 
-#         serializer = EmployeeSerializer(employees, many=True) 
-#         return Response(serializer.data, status=status.HTTP_200_OK)
+
+#         paginator = CustomPageNumberPagination()
+
+#         #main logic conn.
+#         page = paginator.paginate_queryset(employees, request, view=self)
+
+
+#         serializer = EmployeeSerializer(page, many=True)
+#         return paginator.get_paginated_response(serializer.data) 
+#         # return Response(serializer.data, status=status.HTTP_200_OK)
+
+    
 
 #     def post(self, request):
 #         serializer = EmployeeSerializer(data = request.data)
@@ -228,10 +239,18 @@ class EmployeeViewSet(viewsets.ViewSet):
 
 """
 
+
+
+
 #viewset.ModelViewSet
 class EmployeeViewSet(viewsets.ModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
+    pagination_class = CustomPageNumberPagination
+
+
+
+
 
 # class BlogViewSet(viewsets.ModelViewSet):
 #     queryset = Blog.objects.all() 
@@ -245,7 +264,17 @@ class BlogsView(generics.ListCreateAPIView):
     queryset = Blog.objects.all() 
     serializer_class = BlogSerializer
 
+class BlogDetailsView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Blog.objects.all()
+    serializer_class = BlogSerializer
+    lookup_field = 'pk'
+
 class CommentsView(generics.ListCreateAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    
+
+class CommentDetailsView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    lookup_field = 'pk'
+
