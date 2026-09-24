@@ -3,7 +3,7 @@ from rest_framework.response import Response
 
 class CustomPageNumberPagination(PageNumberPagination):
     page_size = 2
-    max_page_size = 1
+    max_page_size = 10
     page_size_query_param = 'page-size'
     page_query_param = 'page-num'
 
@@ -13,7 +13,7 @@ class CustomPageNumberPagination(PageNumberPagination):
             'next' : self.get_next_link(), 
             'previous' : self.get_previous_link(),
             'page_size' : self.page_size, 
-            'result' : data #serialized data
+            'results' : data #serialized data
 
         }) 
 

@@ -13,6 +13,9 @@ from rest_framework import mixins, generics
 from rest_framework import viewsets
 from blogs.models import Blog, Comment
 from .paginations import CustomPageNumberPagination, CustomLimitOffsetPagination
+from django_filters.rest_framework import DjangoFilterBackend
+from .filters import EmployeeFilter
+from rest_framework.filters import SearchFilter, OrderingFilter
 
 
 # Create your views here.
@@ -247,6 +250,11 @@ class EmployeeViewSet(viewsets.ModelViewSet):
     queryset = Employee.objects.all()
     serializer_class = EmployeeSerializer
     pagination_class = CustomPageNumberPagination
+    filter_backends = [DjangoFilterBackend]
+    # filterset_fields = ['designation']
+    filterset_class = EmployeeFilter
+    filter_backends = [OrderingFilter]
+    ordering_fields = ['emp_id']
 
 
 
@@ -263,6 +271,9 @@ class EmployeeViewSet(viewsets.ModelViewSet):
 class BlogsView(generics.ListCreateAPIView):
     queryset = Blog.objects.all() 
     serializer_class = BlogSerializer
+    filter_backends = [SearchFilter, OrderingFilter]
+    search_fields = ['comments__comment', 'blog_title', 'blog_body']
+    ordering_fields = ['pk']
 
 class BlogDetailsView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Blog.objects.all()
@@ -272,6 +283,8 @@ class BlogDetailsView(generics.RetrieveUpdateDestroyAPIView):
 class CommentsView(generics.ListCreateAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+
+
 
 class CommentDetailsView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Comment.objects.all()
